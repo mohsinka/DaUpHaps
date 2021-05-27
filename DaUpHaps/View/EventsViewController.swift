@@ -64,6 +64,9 @@ class EventsViewController: UIViewController {
                 self.indicator.removeFromSuperview()
                 self.tableView.reloadData()
                 
+                if let locationCity = self.venues.first?.venueLocation?.locationCity {
+                    self.titleLabel.text = locationCity
+                }
                 
                 if self.events.count <= 0 {
                     self.tableView.isHidden = true
@@ -77,6 +80,11 @@ class EventsViewController: UIViewController {
     }
     
     func setUpUIComponents() {
+        self.headerView.layer.shadowColor = UIColor.gray.cgColor
+        self.headerView.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
+        self.headerView.layer.shadowRadius = 3.0
+        self.headerView.layer.shadowOpacity = 0.3
+        
         self.noEventsLabel.isHidden = true
         self.goOutTonightButton.layer.backgroundColor = UIColor.black.cgColor
         self.goOutTonightButton.layer.cornerRadius = 5.0
