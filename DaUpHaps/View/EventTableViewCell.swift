@@ -34,7 +34,6 @@ class EventTableViewCell: UITableViewCell {
         self.eventHolderView.layer.shadowOpacity = 0.4
         self.eventHolderView.layer.shadowOffset = .zero
         self.eventHolderView.layer.shadowRadius = 3
-        self.eventHolderView.layer.shadowPath = UIBezierPath(rect: eventHolderView.bounds).cgPath
         
         self.eventDateHolderView.layer.cornerRadius = 5.0
 
