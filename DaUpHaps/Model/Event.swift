@@ -44,7 +44,7 @@ struct Event: Codable {
 }
 
 // MARK: - Ticket
-class Ticket: Codable {
+struct Ticket: Codable {
     let title: String?
     let priceTax: Int?
     let isRequestableTicket: Bool?

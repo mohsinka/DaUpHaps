@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - Venue
-class Venue: Codable {
+struct Venue: Codable {
     let venueLocation: VenueLocation?
     let venueMusic: [String]?
     let accountCurrency, venueURL: String?
@@ -38,7 +38,7 @@ class Venue: Codable {
 }
 
 //// MARK: - VenueLocation
-class VenueLocation: Codable {
+struct VenueLocation: Codable {
     let locationReference, locationAddress, locationCity, locationCountry: String?
     let locationCoordinates: [String]?
     let locationPlaceID: String?

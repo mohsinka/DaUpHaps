@@ -28,11 +28,14 @@ class EventTableViewCell: UITableViewCell {
     
     func configureCellForEvent(_ event:Event, venue:Venue) {
         
-        self.eventHolderView.layer.cornerRadius = 5.0
-        self.eventHolderView.layer.shadowColor = UIColor.gray.cgColor
-        self.eventHolderView.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-        self.eventHolderView.layer.shadowRadius = 7.0
-        self.eventHolderView.layer.shadowOpacity = 0.7        
+        self.eventHolderView.layer.cornerRadius = 2.0
+
+        self.eventHolderView.layer.shadowColor = UIColor.lightGray.cgColor
+        self.eventHolderView.layer.shadowOpacity = 0.4
+        self.eventHolderView.layer.shadowOffset = .zero
+        self.eventHolderView.layer.shadowRadius = 3
+        self.eventHolderView.layer.shadowPath = UIBezierPath(rect: eventHolderView.bounds).cgPath
+        
         self.eventDateHolderView.layer.cornerRadius = 5.0
 
         self.eventNameLabel.text = event.name
@@ -51,7 +54,7 @@ class EventTableViewCell: UITableViewCell {
         
         let startHourTime = self.getTimeHoursForDate(event.startTime!)
         let endHourTime = self.getTimeHoursForDate(event.endTime!)
-        let totalText = startHourTime + " - " + endHourTime
+        let totalText = startHourTime + "-" + endHourTime
         self.eventTimeDurationLabel.text = totalText
         
         let tuple = self.getDayMonthWeekDayForDate(event.startTime!)
@@ -88,31 +91,31 @@ class EventTableViewCell: UITableViewCell {
         
         switch monthOfDay {
         case 1:
-            tuple.1 = "JAN"
+            tuple.1 = "Jan"
         case 2:
-            tuple.1 = "FEB"
+            tuple.1 = "Feb"
         case 3:
-            tuple.1 = "MAR"
+            tuple.1 = "Mar"
         case 4:
-            tuple.1 = "APR"
+            tuple.1 = "Apr"
         case 5:
-            tuple.1 = "MAY"
+            tuple.1 = "May"
         case 6:
-            tuple.1 = "JUN"
+            tuple.1 = "Jun"
         case 7:
-            tuple.1 = "JUL"
+            tuple.1 = "Jul"
         case 8:
-            tuple.1 = "AUG"
+            tuple.1 = "Aug"
         case 9:
-            tuple.1 = "SEP"
+            tuple.1 = "Sep"
         case 10:
-            tuple.1 = "OCT"
+            tuple.1 = "Oct"
         case 11:
-            tuple.1 = "NOV"
+            tuple.1 = "Nov"
         case 12:
-            tuple.1 = "DEC"
+            tuple.1 = "Dec"
         default:
-            tuple.1 = "JAN"
+            tuple.1 = "Jan"
         }
         
         switch weekDay {
@@ -198,6 +201,6 @@ extension UIImageView {
             self.image = UIImage(named: "placeholder")
             return
         }
-            downloaded(from: url, contentMode: mode)
+        downloaded(from: url, contentMode: mode)
     }
 }

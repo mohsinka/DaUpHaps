@@ -23,8 +23,7 @@ class EventsViewController: UIViewController {
     var events = [Event]()
     var venues = [Venue]()
     var rootObject: Root?
-    
-    var indicator = UIActivityIndicatorView()
+    var eventPlaceModel:EventPlaceModel?
     let refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
@@ -37,6 +36,7 @@ class EventsViewController: UIViewController {
                                       bundle: nil), forCellReuseIdentifier: Constants.event_cell)
         self.setUpUIComponents()
         self.initializeRefreshControl()
+        self.showProgress()
         self.fetchEvents()
     }
 
@@ -44,46 +44,65 @@ class EventsViewController: UIViewController {
         
     }
     
+    let activityIndicator: UIActivityIndicatorView? = UIActivityIndicatorView(style: .medium)
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+    }
+    
+    func showProgress() {
+        DispatchQueue.main.async {
+            self.activityIndicator?.center = self.view.center
+            self.activityIndicator?.hidesWhenStopped = true
+            self.activityIndicator?.startAnimating()
+            self.view.addSubview(self.activityIndicator!)
+        }
+    }
+    
+    func hideProgress() {
+        DispatchQueue.main.async {
+            self.activityIndicator?.stopAnimating()
+        }
+    }
+    
     @objc func fetchEvents() {
-        self.initializeActivityIndicator()
-        self.viewModel.parseforEvents(Constants.events_url,
-                                      longitude:45.33539270000001,
-                                      latitude: 29.07379500000002,
-                                      placeId: "ChIJywtkGTF2X0YRZnedZ9MnDag",
-                                      locationRadius: 20,
-                                      pageNumber: 1,
-                                      pageSize: 50) { (rootObj) in
-            
-            self.rootObject = rootObj
-            
-            self.events = self.rootObject?.data.events ?? []
-            self.venues = self.rootObject?.data.venues ?? []
-            
-            DispatchQueue.main.async {
-                self.refreshControl.endRefreshing()
-                self.indicator.removeFromSuperview()
-                self.tableView.reloadData()
+        if let evtPlaceModel = self.eventPlaceModel {
+            self.viewModel.parseforEvents(evtPlaceModel) { (rootObj) in
                 
-                if let locationCity = self.venues.first?.venueLocation?.locationCity {
-                    self.titleLabel.text = locationCity
-                }
+                self.rootObject = rootObj
                 
-                if self.events.count <= 0 {
-                    self.tableView.isHidden = true
-                    self.noEventsLabel.isHidden = false
-                } else {
-                    self.tableView.isHidden = false
-                    self.noEventsLabel.isHidden = true
+                self.events = self.rootObject?.data.events ?? []
+                self.venues = self.rootObject?.data.venues ?? []
+                self.hideProgress()
+                DispatchQueue.main.async {
+                    self.refreshControl.endRefreshing()
+                    self.tableView.reloadData()
+                    
+                    if let locationCity = self.venues.first?.venueLocation?.locationCity {
+                        self.titleLabel.text = locationCity
+                    }
+                    
+                    if self.events.count <= 0 {
+                        self.tableView.isHidden = true
+                        self.noEventsLabel.isHidden = false
+                    } else {
+                        self.tableView.isHidden = false
+                        self.noEventsLabel.isHidden = true
+                    }
                 }
             }
         }
     }
     
     func setUpUIComponents() {
-        self.headerView.layer.shadowColor = UIColor.gray.cgColor
-        self.headerView.layer.shadowOffset = CGSize(width: 0.0, height: 0.0)
-        self.headerView.layer.shadowRadius = 3.0
-        self.headerView.layer.shadowOpacity = 0.3
+        
+        self.eventPlaceModel = EventPlaceModel(url: Constants.events_url,
+                                               longitude: 59.33539270000001,
+                                               latitude: 18.07379500000002,
+                                               placeId: "ChIJywtkGTF2X0YRZnedZ9MnDag",
+                                               locationRadius: 100,
+                                               pageNumber: 1,
+                                               pageSize: 50)
         
         self.noEventsLabel.isHidden = true
         self.goOutTonightButton.layer.backgroundColor = UIColor.black.cgColor
@@ -95,14 +114,6 @@ class EventsViewController: UIViewController {
         refreshControl.addTarget(self, action:#selector(fetchEvents), for: .valueChanged)
         self.tableView.refreshControl = refreshControl
         self.tableView.contentInsetAdjustmentBehavior = .never
-    }
-    
-    func initializeActivityIndicator() {
-        indicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-        indicator.style = UIActivityIndicatorView.Style.medium
-        indicator.color = .clear
-        indicator.center = self.view.center
-        self.view.addSubview(indicator)
     }
     
     func showEventsPopupWithEvent(_ event:Event, venue:Venue) {
@@ -126,7 +137,7 @@ class EventsViewController: UIViewController {
 extension EventsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 250
+        return 160
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return events.count
@@ -137,6 +148,7 @@ extension EventsViewController: UITableViewDelegate, UITableViewDataSource {
         let event = events[indexPath.row]
         let venue = venues[indexPath.row]
         cell.configureCellForEvent(event, venue: venue)
+        cell.selectionStyle = .none
         return cell
     }
     
