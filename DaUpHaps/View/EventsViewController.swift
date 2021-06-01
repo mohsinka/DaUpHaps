@@ -78,10 +78,6 @@ class EventsViewController: UIViewController {
                     self.refreshControl.endRefreshing()
                     self.tableView.reloadData()
                     
-                    if let locationCity = self.venues.first?.venueLocation?.locationCity {
-                        self.titleLabel.text = locationCity
-                    }
-                    
                     if self.events.count <= 0 {
                         self.tableView.isHidden = true
                         self.noEventsLabel.isHidden = false
@@ -96,6 +92,7 @@ class EventsViewController: UIViewController {
     
     func setUpUIComponents() {
         
+        self.titleLabel.text = "Stockholm"
         self.eventPlaceModel = EventPlaceModel(url: Constants.events_url,
                                                longitude: 59.33539270000001,
                                                latitude: 18.07379500000002,
@@ -137,7 +134,7 @@ class EventsViewController: UIViewController {
 extension EventsViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 160
+        return 200
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return events.count
@@ -146,16 +143,16 @@ extension EventsViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Constants.event_cell, for: indexPath) as! EventTableViewCell
         let event = events[indexPath.row]
-        let venue = venues[indexPath.row]
-        cell.configureCellForEvent(event, venue: venue)
+        let venue = self.venues.filter({$0.venueID == event.venueID}).first
+        cell.configureCellForEvent(event, venue: venue!)
         cell.selectionStyle = .none
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let event = events[indexPath.row]
-        let venue = venues[indexPath.row]
-        self.showEventsPopupWithEvent(event, venue: venue)
+        let event = self.events[indexPath.row]
+        let venue = self.venues.filter({$0.venueID == event.venueID}).first
+        self.showEventsPopupWithEvent(event, venue: venue!)
     }
 }
 

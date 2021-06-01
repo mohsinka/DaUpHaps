@@ -45,7 +45,7 @@ class EventTableViewCell: UITableViewCell {
             for image in images {
                 if !image.isEmpty {
                     self.eventImageView.downloaded(from: URL(string:Constants.image_base_url+image)!)
-                    self.eventImageView.contentMode = .scaleToFill
+                    self.eventImageView.contentMode = .scaleAspectFill
                     break
                 }
             }
@@ -64,95 +64,43 @@ class EventTableViewCell: UITableViewCell {
         self.eventDayLabel.text = weekday
         self.eventMonthLabel.text = month
         self.eventDateLabel.text = "\(day)"
-        
-        if event.venueID == venue.venueID {
-            self.eventVenueLabel.text = venue.venueName
-        } else {
-            self.eventVenueLabel.text = "Loading..."
-        }
+        self.eventVenueLabel.text = venue.venueName
     }
     
-    func getDayMonthWeekDayForDate(_ date:String) -> (Int, String, String) {
+    func getDayMonthWeekDayForDate(_ dateStr:String) -> (Int, String, String) {
         var tuple:(Int,String,String) = (1,"","")
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en")
-        dateFormatter.dateFormat = "yyyy.MM.dd'T'HH:mm:ss"
+        let localISOFormatter = ISO8601DateFormatter()
+        localISOFormatter.timeZone = TimeZone(secondsFromGMT: 7200)
         
-        let date = dateFormatter.date(from:date) ?? Date()
-        
-        dateFormatter.dateFormat = "EEEE"
-        let weekDay = dateFormatter.string(from: Date())
+        let date = localISOFormatter.date(from:dateStr)!
         
         let calendar = Calendar.current
         let dayOfMonth = calendar.component(.day, from: date)
-        let monthOfDay = calendar.component(.month, from: date)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM"
         
-        switch monthOfDay {
-        case 1:
-            tuple.1 = "Jan"
-        case 2:
-            tuple.1 = "Feb"
-        case 3:
-            tuple.1 = "Mar"
-        case 4:
-            tuple.1 = "Apr"
-        case 5:
-            tuple.1 = "May"
-        case 6:
-            tuple.1 = "Jun"
-        case 7:
-            tuple.1 = "Jul"
-        case 8:
-            tuple.1 = "Aug"
-        case 9:
-            tuple.1 = "Sep"
-        case 10:
-            tuple.1 = "Oct"
-        case 11:
-            tuple.1 = "Nov"
-        case 12:
-            tuple.1 = "Dec"
-        default:
-            tuple.1 = "Jan"
-        }
-        
-        switch weekDay {
-        case "Sunday":
-            tuple.2 = "SUN"
-        case "Monday":
-            tuple.2 = "MON"
-        case "Tuesday":
-            tuple.2 = "TUE"
-        case "Wednesday":
-            tuple.2 = "WED"
-        case "Thursday":
-            tuple.2 = "THURS"
-        case "Friday":
-            tuple.2 = "FRI"
-        case "Saturday":
-            tuple.2 = "SAT"
-        default:
-            tuple.2 = "SUN"
-        }
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = "EE"
         
         tuple.0 = dayOfMonth
-        
+        tuple.1 = dateFormatter.string(from: date)
+        tuple.2 = dayFormatter.string(from: date).uppercased()
         
         return tuple
     }
     
-    func getTimeHoursForDate(_ date:String) -> String {
+    func getTimeHoursForDate(_ dateStr:String) -> String {
         var hour = ""
         
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en")
-        dateFormatter.dateFormat = "yyyy.MM.dd'T'HH:mm:ss"
+        let localISOFormatter = ISO8601DateFormatter()
+        localISOFormatter.timeZone = TimeZone.current
         
-        let dateNew = dateFormatter.date(from:date) ?? Date()
+        let date = localISOFormatter.date(from:dateStr)!
         dateFormatter.dateFormat = "HH:mm"
         
-        hour = dateFormatter.string(from: dateNew)
+        hour = dateFormatter.string(from: date)
         return hour
     }
 }

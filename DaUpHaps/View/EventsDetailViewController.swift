@@ -40,7 +40,6 @@ class EventsDetailViewController: UIViewController {
             }
         }
         
-        
         let tuple = self.getDayMonthWeekDayForDate(event!.startTime!)
         let day = tuple.0
         let month = tuple.1
@@ -57,100 +56,47 @@ class EventsDetailViewController: UIViewController {
             self.eventTicketsSoldLabel.text = "All Tickets Available"
         }
         
-        
-        if event!.venueID == venue!.venueID {
-            self.eventVenueLabel.text = venue!.venueName
-        } else {
-            self.eventVenueLabel.text = "Loading..."
-        }
-        
+        self.eventVenueLabel.text = venue!.venueName
     }
 
     @IBAction func crossButtonPressed(_ sender: UIButton) {
         sheet!.dismiss(animated: false, completion: nil)
     }
     
-    func getDayMonthWeekDayForDate(_ date:String) -> (Int, String, String) {
+    func getDayMonthWeekDayForDate(_ dateStr:String) -> (Int, String, String) {
         var tuple:(Int,String,String) = (1,"","")
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en")
-        dateFormatter.dateFormat = "yyyy.MM.dd'T'HH:mm:ss"
+        let localISOFormatter = ISO8601DateFormatter()
+        localISOFormatter.timeZone = TimeZone(secondsFromGMT: 7200)
         
-        let date = dateFormatter.date(from:date) ?? Date()
-        
-        dateFormatter.dateFormat = "EEEE"
-        let weekDay = dateFormatter.string(from: Date())
+        let date = localISOFormatter.date(from:dateStr)!
         
         let calendar = Calendar.current
         let dayOfMonth = calendar.component(.day, from: date)
-        let monthOfDay = calendar.component(.month, from: date)
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MMM"
         
-        switch monthOfDay {
-        case 1:
-            tuple.1 = "JAN"
-        case 2:
-            tuple.1 = "FEB"
-        case 3:
-            tuple.1 = "MAR"
-        case 4:
-            tuple.1 = "APR"
-        case 5:
-            tuple.1 = "MAY"
-        case 6:
-            tuple.1 = "JUN"
-        case 7:
-            tuple.1 = "JUL"
-        case 8:
-            tuple.1 = "AUG"
-        case 9:
-            tuple.1 = "SEP"
-        case 10:
-            tuple.1 = "OCT"
-        case 11:
-            tuple.1 = "NOV"
-        case 12:
-            tuple.1 = "DEC"
-        default:
-            tuple.1 = "JAN"
-        }
-        
-        switch weekDay {
-        case "Sunday":
-            tuple.2 = "SUN"
-        case "Monday":
-            tuple.2 = "MON"
-        case "Tuesday":
-            tuple.2 = "TUE"
-        case "Wednesday":
-            tuple.2 = "WED"
-        case "Thursday":
-            tuple.2 = "THURS"
-        case "Friday":
-            tuple.2 = "FRI"
-        case "Saturday":
-            tuple.2 = "SAT"
-        default:
-            tuple.2 = "SUN"
-        }
+        let dayFormatter = DateFormatter()
+        dayFormatter.dateFormat = "EE"
         
         tuple.0 = dayOfMonth
-        
+        tuple.1 = dateFormatter.string(from: date)
+        tuple.2 = dayFormatter.string(from: date).uppercased()
         
         return tuple
     }
     
-    func getTimeHoursForDate(_ date:String) -> String {
+    func getTimeHoursForDate(_ dateStr:String) -> String {
         var hour = ""
         
         let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "en")
-        dateFormatter.dateFormat = "yyyy.MM.dd'T'HH:mm:ss"
+        let localISOFormatter = ISO8601DateFormatter()
+        localISOFormatter.timeZone = TimeZone.current
         
-        let dateNew = dateFormatter.date(from:date) ?? Date()
+        let date = localISOFormatter.date(from:dateStr)!
         dateFormatter.dateFormat = "HH:mm"
         
-        hour = dateFormatter.string(from: dateNew)
+        hour = dateFormatter.string(from: date)
         return hour
     }
     
